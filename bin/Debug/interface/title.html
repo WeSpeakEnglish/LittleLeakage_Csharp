@@ -1,0 +1,309 @@
+<!DOCTYPE HTML> <!-- HTML5 like header -->
+<html>
+<head>
+<title>Barocamera interface by (c)Pinus</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<style type="text/css">
+<!--
+
+.styleRoom{
+ text-align: center;
+ color:#00AA00;
+ font-family: Arial;
+ font-weight:900;
+ font-size: 16pt;
+ border-width: 0px;
+ background: transparent;
+  } 
+ .styleLeft{
+ text-align: center;
+ color:#0000AA;
+ font-family: Arial;
+ font-weight:900;
+ font-size: 16pt;
+ border-width: 0px;
+ background: transparent;
+  } 
+.styleRight{
+ text-align: center;
+ color:#AA0000;
+ font-family: Arial;
+ font-weight:900;
+ font-size: 16pt;
+ border-width: 0px;
+ background: transparent;
+  }   
+ .headset {
+  position: absolute;
+  left: 100px;
+  top: 0px;
+  z-index: -1;
+}
+ .calibrate {
+  cursor: pointer;
+  position: absolute;
+  left: 400px;
+  top: 0px;
+}
+ .room {
+  position: absolute;
+  left: 220px;
+  top: 200px;
+  z-index: 0;
+}
+ .right_cup {
+  position: absolute;
+  left: 400px;
+  top: 200px;
+  z-index: 0;
+}
+ .left_cup {
+  position: absolute;
+  left: 40px;
+  top: 200px;
+  z-index: 0;
+}
+.com_port{
+  position: absolute;
+  left: 70px;
+  top: 300px;
+
+}
+-->
+</style>
+
+<script>
+
+//////
+var Hours = 0;
+var Minutes = 0;
+var Seconds = 0;
+var Days = 1;
+var Months  = 1;
+var Years = 2019;
+
+var CommunicateCOMcondition=0;
+
+var P_Calib = new Array();
+P_Calib[0] = 0.0;
+P_Calib[1] = 0.0;
+P_Calib[2] = 0.0;
+P_Calib[3] = 0.0;
+P_Calib[4] = 0.0;
+P_Calib[5] = 0.0;
+var CalibrateFlag = 0;
+//-- Load images
+
+//manipulating images
+function ChangeImages(imja,kartinka){
+if (document.images){ //document.images[imja].src= eval(kartinka+'.src');
+             imja.src= eval(kartinka+'.src');
+}  
+   }		
+//---------------------------------------------------		
+function WritePorts(core){
+	window.document.all.CommExit.value=core;
+};
+
+function matrixArray(rows,columns){
+  var arr = new Array();
+  for(var i=0; i<rows; i++){
+    arr[i] = new Array();
+    for(var j=0; j<columns; j++){
+      arr[i][j] = i+j+1;//
+    }
+  }
+  return arr;
+}
+
+var Middle_P1_Arr = matrixArray(7,10);
+var Middle_T1_Arr = matrixArray(7,10);
+var Middle_Ind1 = 0;
+var Filled_A1 = false;
+
+function GetMiddleP1(Sensor, Pressure){
+var PressMid = 0;
+
+Middle_P1_Arr[Sensor][Middle_Ind1] = Pressure;
+
+if (Middle_Ind1 == 10)Filled_A1 = true;
+Middle_Ind1 = Middle_Ind1 % 10;
+
+
+ if(Filled_A1 != true){
+  for(i = 0 ; i < Middle_Ind1; i++) PressMid += Middle_P1_Arr[Sensor][i];
+  
+  return PressMid/Middle_Ind1;
+   
+ }
+ else{
+  for(i = 0 ; i < 10; i++) PressMid += Middle_P1_Arr[Sensor][i];
+  }
+  return PressMid/10;
+  
+}
+
+function SetValuesToHTML(Temp_Room, Pressure_Room, Temp_L, Pressure_L, Temp_R, Pressure_R, VoltageResistance, CurrentResistance, ErrorCode, Condition){ // set Values To the Form
+
+
+
+Pressure_Room = GetMiddleP1(0,Pressure_Room);
+Pressure_L = GetMiddleP1(1,Pressure_L);
+
+if(CalibrateFlag == 1){
+CalibPressure(Pressure_Room, Pressure_L);
+CalibrateFlag = 0;
+}
+
+Pressure_Room = Pressure_Room - P_Calib[0];
+Pressure_L = Pressure_L - P_Calib[1];
+
+Middle_Ind1++;
+
+ window.document.all['temperature'].innerHTML = (Temp_Room/100.0).toFixed(2) + "°C";
+ window.document.all['pressure'].innerHTML = (Pressure_Room/1000.0).toFixed(2)+ "hPa" ;
+ 
+ window.document.all['temperatureL'].innerHTML = (Temp_L/100.0).toFixed(2) + "°C";
+ window.document.all['pressureL'].innerHTML = (Pressure_L/1000.0).toFixed(2)+ "hPa" ;
+ 
+ window.document.all['temperatureR'].innerHTML = (Temp_R/100.0).toFixed(2) + "°C";
+ window.document.all['pressureR'].innerHTML = (Pressure_R/1000.0).toFixed(2)+ "hPa" ;
+ }
+ 
+ function CreateCOMportsList (DisplayList) 
+ {
+
+ window.document.all['selectCOM'].innerHTML = "<select id=selectCOMis size=1><option value=0 selected style='background-color:#fcc;'>Select a COM - port</option>"+DisplayList+"</select>";
+ }
+ 
+function CommunicateToCOM () 
+ {
+ var IndexSelected= window.document.all.selectCOMis.selectedIndex;
+ if(IndexSelected==0){
+    alert("Выберите порт!");
+	}
+ else{	
+    
+    if (CommunicateCOMcondition==0){ 
+          window.document.all['ConnectButton'].innerHTML = '<img src="../interface/images/disconnect.png">';
+		  CommunicateCOMcondition = 1;
+		  window.external.ConnectToCom(window.document.all.selectCOMis.options[IndexSelected].value,1);
+       }
+	else{
+	      window.document.all['ConnectButton'].innerHTML = '<img src="../interface/images/connect.png">';
+		  CommunicateCOMcondition = 0;
+		  window.external.ConnectToCom(window.document.all.selectCOMis.options[IndexSelected].value,0);
+	} 
+   }	
+ }
+ function SendParams(ParamsType){ //what params (like delays, currents, and voltages we have to translate)
+// var Delay1=0;
+// var Delay2=0;
+  switch(ParamsType){
+	case 2:
+	window.external.SendSettings(3,(Delay1_Result*25.0).toFixed(0).toString(),(Delay2_Result*25.0).toFixed(0).toString());
+		break;
+	case 3:
+	window.external.SendSettings(3,(Delay1_Result*25.0).toFixed(0).toString(),(Delay2_Result*25.0).toFixed(0).toString());
+		break;
+	case 4:
+	window.external.SendSettings(3,(OutVoltageSetup).toFixed(0).toString(),(OutVoltageTreshold).toFixed(0).toString());
+		break;	
+	case 5:
+	window.external.SendSettings(3,(OutCurrentLimit).toFixed(0).toString(),(OutCurrentTreshold).toFixed(0).toString());
+		break;	
+	case 6:
+	window.external.SendSettings(3,(Days*2048 + Hours*64 + Minutes).toFixed(0).toString(),((Years-2000)*1024 + Months*64 + Seconds).toFixed(0).toString());
+		break;	
+	case 7:
+	window.external.SendSettings(3,(Days*2048 + Hours*64 + Minutes).toFixed(0).toString(),((Years-2000)*1024 + Months*64 + Seconds).toFixed(0).toString());
+		break;
+  }
+ 
+ }
+ 
+
+ 
+ function SetRealTime(){
+ var NowDate = new Date(); //new date
+ Hours = NowDate.getHours();
+ Days =  NowDate.getDate();
+ Minutes = NowDate.getMinutes();
+ Seconds = NowDate.getSeconds();
+ Years = NowDate.getFullYear();
+ Months = NowDate.getMonth()+1;
+ //Days = NowDate.getDays();
+ //Seconds = NowDate.getSeconds();
+ 
+ window.document.all.HoursSet.value	=	Hours;
+ window.document.all.MinutesSet.value	= Minutes;
+ window.document.all.SecondsSet.value	=	Seconds;
+ window.document.all.DaysSet.value	= Days;
+ window.document.all.MonthsSet.value	= Months;
+ window.document.all.YearsSet.value	=	Years;
+ //window.document.all.DaysSet.value	= Days;
+ return;
+ }
+ 
+ function CalibPressure(Pressure_Room, Pressure_L){
+   P_Calib[0] = Pressure_Room - (Pressure_Room + Pressure_L)/2;
+   P_Calib[1] = Pressure_L - (Pressure_Room + Pressure_L)/2;
+ }
+</script>
+</head>
+
+<body bgcolor="#EEEEFF" >
+
+<img src="../interface/images/headset.png" alt="HEADSET" class="headset"><br/>
+<img src="../interface/images/calibrate.png" alt="Calibrate" class="calibrate" onClick="javascript:CalibrateFlag =1;" onmousedown = "javascript:this.style.border =  '4px solid yellow';" onmouseup = "javascript:this.style.border =  '0px';"><br/>
+
+<table align = "center" border = "0" cellspacing="0" cellpadding = "0" class="room">
+	<tr>
+		<td align = "center" width = "120" bgcolor="#EEEEAA" > Press. & Temp.:</td>
+	</tr>
+	<tr>
+		<td align = "center" width = "120" bgcolor="#FFFFCC"><span class = "styleRoom" type = "text" id = "temperature"></span></td>
+	</tr>	
+	<tr>
+		<td align = "center" width = "120" bgcolor="#FFFFCC"><span class = "styleRoom" type = "text" id = "pressure"></span></td>
+	</tr>	
+</table>	
+<table align = "center" border = "0" cellspacing="0" cellpadding = "0" class="left_cup">
+	<tr>
+		<td align = "center" width = "120" bgcolor="#EEEEAA" > Press. & Temp.:</td>
+	</tr>
+	<tr>
+		<td align = "center" width = "120" bgcolor="#FFFFCC"><span class = "styleLeft" type = "text" id = "temperatureL"></span></td>
+	</tr>	
+	<tr>
+		<td align = "center" width = "120" bgcolor="#FFFFCC"><span class = "styleLeft" type = "text" id = "pressureL"></span></td>
+	</tr>	
+</table>	
+
+<table align = "center" border = "0" cellspacing="0" cellpadding = "0" class="right_cup">
+	<tr>
+		<td align = "center" width = "120" bgcolor="#EEEEAA" > Press. & Temp.:</td>
+	</tr>
+	<tr>
+		<td align = "center" width = "120" bgcolor="#FFFFCC"><span class = "styleRight" type = "text" id = "temperatureR"></span></td>
+	</tr>	
+	<tr>
+		<td align = "center" width = "120" bgcolor="#FFFFCC"><span class = "styleRight" type = "text" id = "pressureR"></span></td>
+	</tr>	
+</table>	
+
+<div class="com_port">
+<TEXTAREA type="text" cols="50" rows="3" name="CommExit" value="123" ></TEXTAREA><br/>
+         <table border="0">
+			<tr>
+				<td>
+		<span id="selectCOM">&nbsp;</span>
+		        </td>
+				<td valign="center">
+		<span onClick="CommunicateToCOM();" id="ConnectButton"><img src="../interface/images/connect.png"></span>
+		        </td>
+			</tr>
+		 </table>		  
+</div>
+</body>
+</html>

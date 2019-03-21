@@ -1,0 +1,7 @@
+C:\PROJECTS\LeakageCameraWinAPP\Drive1\obj\Debug\ResolveAssemblyReference.cache
+C:\PROJECTS\LeakageCameraWinAPP\Drive1\obj\Debug\Drive1.MainForm.resources
+C:\PROJECTS\LeakageCameraWinAPP\Drive1\obj\Debug\Barocamera.csproj.GenerateResource.Cache
+C:\PROJECTS\LeakageCameraWinAPP\Drive1\bin\Debug\Barocamera.exe
+C:\PROJECTS\LeakageCameraWinAPP\Drive1\bin\Debug\Barocamera.pdb
+C:\PROJECTS\LeakageCameraWinAPP\Drive1\obj\Debug\Barocamera.exe
+C:\PROJECTS\LeakageCameraWinAPP\Drive1\obj\Debug\Barocamera.pdb

@@ -62,7 +62,7 @@
 .array_data{
   position: absolute;
   left: 70px;
-  top: 450px;
+  top: 460px;
 
 }
 
@@ -297,17 +297,25 @@ $(document).ready(function () {
 </script>
 <script>
 var Started = 0;
+var allData;
 
 function updateData(){
 Pressure = GetMiddleP1(0,Pressure);
 var OrigPressire = Pressure/1000.0;
  if(! isNaN(OrigPressire) ){
-var allData = plot.getData(); // allData is an array of series objects
- allData[0].data.push([IndArray*1000,OrigPressire]);
+ allData = plot.getData(); // allData is an array of series objects
+ allData[0].data.push([IndArray * 1000, OrigPressire.toFixed(2)]);
  plot.setData(allData);
  plot.setupGrid();  // if axis have changed
  plot.draw();
-window.document.all['array_data_out'].value = d1.toString();
+ 
+ var StrToPrint = "";
+ 
+for (var i = 0; i < allData[0].data.length; i++){
+ StrToPrint += allData[0].data[i].toString() + "; \n";
+ 
+}
+ window.document.all['array_data_out'].value = StrToPrint;
 IndArray ++;
 }
 }
@@ -337,6 +345,16 @@ IndArray ++;
 function stopClock(){ 
 
 } 
+
+function EraseData(){
+ IndArray = 0;
+
+ allData[0].data = [];
+ 
+ plot.setData(allData);
+ plot.setupGrid();  // if axis have changed
+ plot.draw();
+}
 
 </script>
 </head>
@@ -369,7 +387,7 @@ function stopClock(){
 		        </td>
 				<td valign="center">
 		<span onClick="CommunicateToCOM();" id="ConnectButton"><img src="../interface/images/connect.png"/> </span>
-		<button onClick="javascript:setOutTimer();" id = "startRecButton">Start Record data</button>
+		<br/><button onClick="javascript:setOutTimer();" id = "startRecButton">Start Record data</button><button onClick="javascript:EraseData();" id = "EraseData">Erase Data</button>
 		        </td>
 			</tr>
 		 </table>		  

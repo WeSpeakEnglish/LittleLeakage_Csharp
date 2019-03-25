@@ -59,6 +59,13 @@
 
 }
 
+.array_data{
+  position: absolute;
+  left: 70px;
+  top: 400px;
+
+}
+
 #placeholder { width: 500px; height: 250px; }
 
 .yaxisLabel {
@@ -71,7 +78,7 @@
     top: 30px; 
     left: 30px; 
 	font-family: Verdana, Arial, sans-serif; 
-	font-size: 10px; 
+	font-size: 11px; 
    }
 -->
 </style>
@@ -124,6 +131,7 @@ var Middle_P1_Arr = matrixArray(7,10);
 var Middle_T1_Arr = matrixArray(7,10);
 var Middle_Ind1 = 0;
 var Filled_A1 = false;
+var IndArray = 0;
 
 function GetMiddleP1(Sensor, Pressure){
 var PressMid = 0;
@@ -159,9 +167,21 @@ Pressure_Room = GetMiddleP1(0,Pressure_Room);
 
 
 Middle_Ind1++;
+var OrigPressire = Pressure_Room/1000.0;
+ if(! isNaN(OrigPressire) ){
+var allData = plot.getData(); // allData is an array of series objects
+ allData[0].data.push([IndArray*1000,OrigPressire]);
+ plot.setData(allData);
+ plot.setupGrid();  // if axis have changed
+ plot.draw();
+window.document.all['array_data_out'].value = d1.toString();
+IndArray ++;
+}
 
  window.document.all['temperature'].innerHTML = (Temp_Room/100.0).toFixed(2) + "°C";
  window.document.all['pressure'].innerHTML = (Pressure_Room/1000.0).toFixed(2)+ "hPa" ;
+ 
+ 
  
  }
  
@@ -246,12 +266,11 @@ function CommunicateToCOM ()
 <script type='text/javascript' language='javascript' src='jquery.flot.min.js'></script>
 <script language='javascript' type='text/javascript' src='jquery.flot.time.js'></script>
 <script type='text/javascript'>
-var d1 = [
-[1551799910000,4.5],[1551798986000,4.5],[1551798116000,4.5],[1551797186000,4.5],[1551796313000,4.5],[1551795382000,4.6],[1551794514000,4.6],[1551793583000,4.7]];
+var d1 = [];
 
-
+var plot;
 $(document).ready(function () {
-    $.plot($('#placeholder'), [
+    plot = $.plot($('#placeholder'), [
 	{ data: d1, label: 'Pressure, hPA' }
 
 	  ],{
@@ -270,7 +289,7 @@ $(document).ready(function () {
          //   axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
          //   axisLabelPadding: 50
 		 xaxes: [ { mode: 'time' , 
-					timeformat: '%d.%m.%y,%H:%M',
+					timeformat: '%M:%S',
 					 timezone: 'browser'
 					} ],
         
@@ -300,7 +319,12 @@ $(document).ready(function () {
 	</tr>	
 </table>	
 <div id='placeholder' align ='center' class='block2'></div>
-<div class="com_port">
+
+
+<TEXTAREA type="text" cols="50" rows="5" id="array_data_out" value="" class ="array_data"></TEXTAREA>
+
+
+<div class="com_port"> 
 <TEXTAREA type="text" cols="50" rows="3" name="CommExit" value="123" ></TEXTAREA><br/>
          <table border="0">
 			<tr>
@@ -312,6 +336,6 @@ $(document).ready(function () {
 		        </td>
 			</tr>
 		 </table>		  
-</div>
+</div> 
 </body>
 </html>

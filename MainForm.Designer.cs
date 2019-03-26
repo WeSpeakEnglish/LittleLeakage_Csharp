@@ -43,6 +43,7 @@ namespace Drive1
 			this.webBrowser1 = new System.Windows.Forms.WebBrowser();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
 			this.SuspendLayout();
 			// 
 			// webBrowser1
@@ -63,6 +64,10 @@ namespace Drive1
 			this.serialPort1.ReadTimeout = 1000;
 			this.serialPort1.WriteTimeout = 1000;
 			// 
+			// saveFileDialog1
+			// 
+			this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.SaveFileDialog1FileOk);
+			// 
 			// MainForm
 			// 
 			resources.ApplyResources(this, "$this");
@@ -77,6 +82,7 @@ namespace Drive1
 		private System.IO.Ports.SerialPort serialPort1;
 		private System.Windows.Forms.Timer timer1;
 		private System.Windows.Forms.WebBrowser webBrowser1;
+		private System.Windows.Forms.SaveFileDialog saveFileDialog1;
 		
 		void Timer1Tick(object sender, System.EventArgs e)
 		{

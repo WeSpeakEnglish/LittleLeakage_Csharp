@@ -62,7 +62,7 @@
 .array_data{
   position: absolute;
   left: 70px;
-  top: 460px;
+  top: 465px;
 
 }
 
@@ -188,7 +188,7 @@ function CommunicateToCOM ()
  {
  var IndexSelected= window.document.all.selectCOMis.selectedIndex;
  if(IndexSelected==0){
-    alert("Выберите порт!");
+    alert("Select a COM port!");
 	}
  else{	
     
@@ -201,6 +201,7 @@ function CommunicateToCOM ()
 	      window.document.all['ConnectButton'].innerHTML = '<img src="../interface/images/connect.png">';
 		  CommunicateCOMcondition = 0;
 		  window.external.ConnectToCom(window.document.all.selectCOMis.options[IndexSelected].value,0);
+		  setOutTimer();
 	} 
    }	
  }
@@ -300,11 +301,12 @@ var Started = 0;
 var allData;
 
 function updateData(){
+
 Pressure = GetMiddleP1(0,Pressure);
 var OrigPressire = Pressure/1000.0;
  if(! isNaN(OrigPressire) ){
  allData = plot.getData(); // allData is an array of series objects
- allData[0].data.push([IndArray * 1000, OrigPressire.toFixed(2)]);
+ allData[0].data.push([IndArray * 1000, OrigPressire.toFixed(3)]);
  plot.setData(allData);
  plot.setupGrid();  // if axis have changed
  plot.draw();
@@ -312,7 +314,7 @@ var OrigPressire = Pressure/1000.0;
  var StrToPrint = "";
  
 for (var i = 0; i < allData[0].data.length; i++){
- StrToPrint += allData[0].data[i].toString() + "; \n";
+ StrToPrint += (allData[0].data[i][0]/1000).toString() +","+ allData[0].data[i][1].toString() + "\n";
  
 }
  window.document.all['array_data_out'].value = StrToPrint;
@@ -329,7 +331,7 @@ IndArray ++;
  
  function setOutTimer(){
  
- if(!Started){
+ if(!Started && CommunicateCOMcondition){
  timerFunc1 = window.setInterval("updateData();", 1000);
  Started = true;
  window.document.all['startRecButton'].innerHTML = "Stop Record data";
@@ -350,7 +352,7 @@ function EraseData(){
  IndArray = 0;
 
  allData[0].data = [];
- 
+ window.document.all['array_data_out'].value = "";
  plot.setData(allData);
  plot.setupGrid();  // if axis have changed
  plot.draw();
@@ -383,12 +385,19 @@ function EraseData(){
          <table border="0">
 			<tr>
 				<td>
-		<span id="selectCOM">&nbsp;</span>
+		<span id="selectCOM" valign = "top">&nbsp;</span><br/>
 		        </td>
 				<td valign="center">
-		<span onClick="CommunicateToCOM();" id="ConnectButton"><img src="../interface/images/connect.png"/> </span>
-		<br/><button onClick="javascript:setOutTimer();" id = "startRecButton">Start Record data</button><button onClick="javascript:EraseData();" id = "EraseData">Erase Data</button>
+		<span onClick="CommunicateToCOM();" id="ConnectButton"><img src="../interface/images/connect.png"/></span>
+		
 		        </td>
+			</tr>
+			<tr>
+			<td colspan="2">
+			<button onClick="javascript:setOutTimer();" id = "startRecButton">Start Record data</button>
+			<button onClick="javascript:EraseData();" id = "EraseData">Erase Data</button>
+			<button onClick="javascript:window.external.SaveToCSV(window.document.all['array_data_out'].value,0);" id = "SaveFileCSV">Save to CSV file</button>
+			</td>
 			</tr>
 		 </table>		  
 </div> 

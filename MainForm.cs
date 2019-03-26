@@ -71,9 +71,7 @@ namespace Drive1
       DataConverters DataConverter1 = new DataConverters();
       Int32[] ValuesOfSource =  new Int32[10];
 
-      /// protection
-      /// for break of package
-      int tV=0; //test break message
+
 
       if(read_buf.Length != 32)
       	return;
@@ -162,7 +160,24 @@ private void webBrowser1_Navigating(object sender,
 			}
 		
 		}
- 
+		
+  public void SaveToCSV (string FieldStr, int ExtraParam){
+    SaveFileDialog saveFileDialog1 = new SaveFileDialog();      
+    saveFileDialog1.InitialDirectory = "C:\\"; 
+    saveFileDialog1.FileName = "Leakage"+DateTime.Now.ToString().Replace('/','_').Replace(':','_')+".csv";
+    saveFileDialog1.Title = "Save CSV File";      
+    saveFileDialog1.CheckFileExists = false;      
+    saveFileDialog1.CheckPathExists = true;      
+    saveFileDialog1.DefaultExt = "csv";      
+    saveFileDialog1.Filter = "CSV files (*.csv)|*.csv";      
+    saveFileDialog1.FilterIndex = 1;      
+    saveFileDialog1.RestoreDirectory = true;      
+    if (saveFileDialog1.ShowDialog() == DialogResult.OK) {      
+        using (StreamWriter sw = new StreamWriter(saveFileDialog1.FileName))
+        sw.WriteLine (FieldStr);     
+    }      
+		
+		}
  public void SendSettings (int typeSettings, string FirstParam, string SecondParam){ // transfer settings to COM-port
  
   byte[] ParamsToSend={0,0,0,0};
@@ -209,6 +224,10 @@ private void webBrowser1_Navigating(object sender,
 		void MainFormClosing(object sender, FormClosingEventArgs e)
 		{
 			//if(MyPort != null)MyPort.Close();
+		}
+		void SaveFileDialog1FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+	
 		}
 		
 	}
